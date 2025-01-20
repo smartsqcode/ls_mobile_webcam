@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile webcam test</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #ddd;
+        }
+        #errorMessage {
+            margin-top: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button id="takePictureButton">Take Picture</button>
+        <p id="errorMessage" style="display: none;">Unable to access the camera. Please check your permissions or try again.</p>
+    </div>
+
+    <script>
+        document.getElementById('takePictureButton').addEventListener('click', async function() {
+            try {
+                // Проверяем доступность камеры
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+                // Если камера доступна, создаем <input> для запуска системной камеры
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.capture = 'environment'; // Предпочтение для задней камеры
+
+                input.style.display = 'none'; // Скрываем элемент
+                document.body.appendChild(input);
+
+                input.onchange = (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        alert('Photo captured successfully!');
+                    } else {
+                        document.getElementById('errorMessage').textContent = 'Failed to capture photo. Please try again.';
+                        document.getElementById('errorMessage').style.display = 'block';
+                    }
+                    document.body.removeChild(input);
+                };
+
+                input.click(); // Запускаем системное приложение камеры
+            } catch (error) {
+                // Если камера недоступна, выводим сообщение об ошибке
+                console.error('Camera access error:', error);
+                document.getElementById('errorMessage').textContent = 'Unable to access the camera. Please check your device or permissions.';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
